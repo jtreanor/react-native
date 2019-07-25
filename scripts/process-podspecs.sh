@@ -27,8 +27,9 @@ fi
 
 cd "$SPEC_REPO_DIR"
 SPEC_REPOS="$(git remote get-url origin),https://github.com/CocoaPods/Specs.git"
+PODSPECS="$ROOT/{React-Core,React/React-DevSupport,Libraries/**/*,ReactCommon/cxxreact/*,ReactCommon/jsi*/*,ReactCommon/yoga/*,ReactCommon/ReactCommon}.podspec"
 
-POD_LINT_OPT="--verbose --allow-warnings --fail-fast --private --swift-version=3.0 --sources=$SPEC_REPOS"
+POD_LINT_OPT="--verbose --allow-warnings --fail-fast --private --swift-version=3.0 --sources=$SPEC_REPOS --include-podspecs=$PODSPECS"
 
 # Get the version from a podspec.
 version() {
@@ -37,12 +38,12 @@ version() {
 
 # Lint both framework and static library builds.
 lint() {
-  local SUBSPEC=$1
-  if [ "${SUBSPEC:-}" ]; then
-    local SUBSPEC_OPT="--subspec=$SUBSPEC"
+  local PODSPEC=$1
+  if [ "${PODSPEC:-}" ]; then
+    local PODSPEC_OPT="$PODSPEC"
   fi
-  pod lib lint $SUBSPEC_OPT $POD_LINT_OPT
-  pod lib lint $SUBSPEC_OPT $POD_LINT_OPT --use-libraries
+  pod lib lint $PODSPEC_OPT $POD_LINT_OPT
+  pod lib lint $PODSPEC_OPT $POD_LINT_OPT --use-libraries
 }
 
 # Push the spec in arg `$1`, which is expected to be in the cwd, to the `SPEC_REPO` in JSON format.
@@ -72,5 +73,5 @@ push Folly.podspec
 push DoubleConversion.podspec
 push glog.podspec
 
-process "$ROOT/ReactCommon/yoga"
-process "$ROOT" _ignore_me_subspec_for_linting_
+# process "$ROOT/ReactCommon/yoga"
+process "$ROOT" "React.podspec"
